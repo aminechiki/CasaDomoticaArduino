@@ -90,7 +90,7 @@ led led_room_regolate_humidity = led(min_power_request_range, max_power_request_
 
 //TIME
 //if it is less than this time, the first time it is pressed it lights up at the minium_light_percentage
-int turn_on_time = 200;
+int turn_on_time = 400;
 //is the time it takes for the LED to light up at maximum starting from 0
 int maximum_light_on_time = 3000;
 //ILLUMINATION PERCENTAGE RANGE

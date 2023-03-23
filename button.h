@@ -4,26 +4,34 @@
 class button {
 
 private:
-
-  float power_request;                      
+  
+  //PIN INPUT
   int pin_in;
+  //POWER REQUEST
+  float power_request;  
+  float previous_power_request;
+  int min_power_request_range;
+  int max_power_request_range;
+  //STATE
   bool state_out;
   bool previous_state_button;
   bool button_pressed_light_led;
-  unsigned long button_press_time;
-  unsigned long difference_time;
-  int min_power_request_range;
-  int max_power_request_range;
   bool diminish_light_led;
-  unsigned long time_start_diminish_light_led;
-  unsigned long time_start_diminuish; 
   bool first_time_turn_on_light;
   bool first_time_dimmer_light;
   bool flag_first_time_dimmer_light;
   bool start_dimmer;
-  int previous_power_request;
   bool minium_percentage_power_request;
   bool first_moment_start_dimmer;
+  //TIME
+  unsigned long button_press_time;
+  unsigned long difference_time;
+  unsigned long time_start_diminish_light_led;
+  unsigned long time_start_diminuish; 
+  unsigned long time_start_dimmer;
+  unsigned long time_start_dimmer_difference;
+  unsigned long first_time_dimmer_light_time_start;
+  unsigned long first_time_dimmer_light_difference;
 
 public:
   int turn_on_time;
@@ -77,20 +85,30 @@ float button::light_regolate(int minium_light_percentage, int max_light_percenta
  
       //if it's the first time I want to illuminate the room by controlling the brightness
       if(!first_time_dimmer_light){
+
+        if(!flag_first_time_dimmer_light) first_time_dimmer_light_time_start = millis();
+
+      first_time_dimmer_light_difference = millis() - first_time_dimmer_light_time_start;
+      
       flag_first_time_dimmer_light = true;
-      power_request = max_light * difference_time / maximum_light_on_time;
-      previous_power_request = power_request;
+      power_request = max_light * first_time_dimmer_light_difference / maximum_light_on_time;
       }
 
       //if it's not the first time i want to adjust the brightness then ...
       if(start_dimmer){
+
       //I get the time difference based on the power_request
       float difference_time_power_request;
+
       if(!first_moment_start_dimmer) {
+
+
         difference_time_power_request = (maximum_light_on_time / max_light ) * power_request;
+        time_start_dimmer = millis();
       }
 
-      power_request = max_light * (difference_time_power_request + difference_time) / maximum_light_on_time;   
+      time_start_dimmer_difference = millis() - time_start_dimmer;
+      power_request = max_light * (difference_time_power_request + time_start_dimmer_difference) / maximum_light_on_time;  
       first_moment_start_dimmer = true;
       }
 
@@ -98,7 +116,7 @@ float button::light_regolate(int minium_light_percentage, int max_light_percenta
       if(power_request >= max_light) {    
         time_start_diminuish = millis();
         diminish_light_led = true;       
-      }     
+      }       
     }
     
     //diminish light led    
@@ -118,10 +136,10 @@ float button::light_regolate(int minium_light_percentage, int max_light_percenta
       
       //I check to verify that the power_request does not go into negativity
       if(power_request - (previous_power_request - power_request) < 0) power_request = minium_light;
-
       }
-      previous_power_request = power_request;
+      // previous_power_request = power_request;
     }
+      previous_power_request = power_request;
   }
 
   //if the button is released ...
@@ -142,16 +160,14 @@ float button::light_regolate(int minium_light_percentage, int max_light_percenta
     button_pressed_light_led = false;
     diminish_light_led = false;
     if(flag_first_time_dimmer_light && !diminish_light_led) start_dimmer = true;
-
-    
   }
 
-  Serial.print("POWER REQUEST : ");
+  Serial.print("POWER_REQUEST: ");
   Serial.print(power_request);
   Serial.print("\n");
-  Serial.print("difference_time : ");
-  Serial.print(difference_time);
-  Serial.print("\n");
+  // Serial.print("difference_time : ");
+  // Serial.print(difference_time);
+  // Serial.print("\n");
   Serial.print("===============================================");
   Serial.print("\n");
 
