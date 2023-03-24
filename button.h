@@ -101,8 +101,6 @@ float button::light_regolate(int minium_light_percentage, int max_light_percenta
       float difference_time_power_request;
 
       if(!first_moment_start_dimmer) {
-
-
         difference_time_power_request = (maximum_light_on_time / max_light ) * power_request;
         time_start_dimmer = millis();
       }
