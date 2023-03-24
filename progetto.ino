@@ -6,16 +6,23 @@
 #include "timer.h"
 #include <Servo.h>
 #include "button.h"
+#include "motor_shutters.h"
+#include "buttons_shutters.h"
 
 //CONTROL ROOM - (Arduino)
 //INPUT
 #define SENSOR_TEMPERATURE_HUMIDITY 2
 #define LIGHT_CONTROL 9
+#define BUTTON_ON_SHUTTERS 6
+#define BUTTON_DOWN_SHUTTERS 5
 
 //OUTPUT
 #define TEMPERATURE_VALVE 5
 #define HUMIDITY_VALVE 6
 #define ROOM_LIGHTS 11
+#define MOTOR_ON_SHUTTERS 3
+#define MOTOR_DOWN_SHUTTERS 4
+#define MOTOR_SPEED 9
 
 //VARIABLES SET BY THE APPLICATION
 
@@ -100,6 +107,22 @@ int max_light_percentage = 100;
 button light_control = button(LIGHT_CONTROL ,min_power_request_range ,max_power_request_range);
 led light_room = led(min_power_request_range, max_power_request_range, ROOM_LIGHTS);
 
+// - CONTROL SHUTTERS
+
+// BUTTON_ON_SHUTTERS 5
+// BUTTON_DOWN_SHUTTERS 6
+
+buttons_shutters buttons_control_shutters = buttons_shutters(BUTTON_ON_SHUTTERS ,BUTTON_DOWN_SHUTTERS);
+int direction_motor_shutters;
+enum states_motor_shutters {stopped, on_shutters ,down_shutters};
+int shutter_opening_closing_time = 8000;
+int rolling_shutter_rotation_time = 1000;
+
+// - MOTOR SHUTTERS
+
+motor_shutters motor_shutters_room = motor_shutters(MOTOR_ON_SHUTTERS, MOTOR_DOWN_SHUTTERS, MOTOR_SPEED ,min_power_request_range ,max_power_request_range);
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -108,13 +131,22 @@ void setup() {
 
 void loop() {
 
+    // - CONTROL SHUTTERS ROOM
+
+    //control direction
+    direction_motor_shutters = buttons_control_shutters.control_rotation();
+    motor_shutters_room.control_direction(direction_motor_shutters);
+    //control speed
+    buttons_control_shutters.control_speed(shutter_opening_closing_time ,rolling_shutter_rotation_time);
+    motor_shutters_room.speed(200);
+
     //- CONTROL LIGHT ROOM
 
-    light_control.turn_on_time = turn_on_time;
-    light_control.maximum_light_on_time = maximum_light_on_time;
-    light_control.state_in = digitalRead(LIGHT_CONTROL);
-    float power_request_light_room = light_control.light_regolate(minium_light_percentage ,max_light_percentage);
-    light_room.blink(power_request_light_room);
+    // light_control.turn_on_time = turn_on_time;
+    // light_control.maximum_light_on_time = maximum_light_on_time;
+    // light_control.state_in = digitalRead(LIGHT_CONTROL);
+    // float power_request_light_room = light_control.light_regolate(minium_light_percentage ,max_light_percentage);
+    // light_room.blink(power_request_light_room);
 
   if (check_time_temperature_humidity.check_time()) {
 
