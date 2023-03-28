@@ -99,7 +99,7 @@ led led_room_regolate_humidity = led(min_power_request_range, max_power_request_
 //if it is less than this time, the first time it is pressed it lights up at the minium_light_percentage
 int turn_on_time = 400;
 //is the time it takes for the LED to light up at maximum starting from 0
-int maximum_light_on_time = 3000;
+int maximum_light_on_time = 10000;
 //ILLUMINATION PERCENTAGE RANGE
 int minium_light_percentage = 5;
 int max_light_percentage = 100;
@@ -116,8 +116,8 @@ buttons_shutters buttons_control_shutters = buttons_shutters(BUTTON_ON_SHUTTERS 
 int direction_motor_shutters;
 enum states_motor_shutters {stopped, on_shutters ,down_shutters};
 //time
-int shutter_opening_closing_time = 3000;
-int rolling_shutter_rotation_time = 1000;
+int shutter_opening_closing_time = 6000;
+int rolling_shutter_rotation_time = 8800;
 //power request
 float power_request_motor_shutters;
 

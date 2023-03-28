@@ -7,8 +7,9 @@ private:
   //time
   int shutter_opening_closing_time;
   int rolling_shutter_rotation_time;
-  unsigned long time_start_on_shutters;
+
   //time on shutters
+  unsigned long time_start_on_shutters;
   unsigned long difference_time_start_on_shutters;
   bool is_on_shutters;
   unsigned long sum_difference_time_start_on_shutters;
@@ -40,11 +41,34 @@ private:
   bool is_down_stopped;
   unsigned long total_difference_time_start_down_on_shutters;
 
+  //ROLLING
+  //time on shutters
+  unsigned long time_start_on_shutters_rolling;
+  unsigned long difference_time_start_on_shutters_rolling;
+  // bool is_on_shutters;
+  unsigned long sum_difference_time_start_on_shutters_rolling;
+  //time down shutters
+  unsigned long time_start_down_shutters_rolling;
+  unsigned long difference_time_start_down_shutters_rolling;
+  unsigned long sum_difference_time_start_down_shutters_rolling;
+  // bool is_down_shutters;
+  //time down/on
+  unsigned long difference_time_start_down_on_shutters_rolling;
+  unsigned long total_difference_time_start_down_on_shutters_rolling;
+
+  //states
+  bool alza;
+  bool abbassa;
+  bool is_on_shutters_rolling;
+
+  // unsigned long time_start_on_shutters_rolling;
+  // unsigned long difference_time_start_on_shutters_rolling;
+
 
 public:
   buttons_shutters(int button_on_shutters, int button_down_shutters);
   int control_rotation();
-  float control_speed(int shutter_opening_closing_time ,int rolling_shutter_rotation_time);
+  float control_speed(int shutter_opening_closing_time, int rolling_shutter_rotation_time);
 };
 
 //constructor
@@ -107,7 +131,7 @@ int buttons_shutters::control_rotation() {
 
       case down_shutters:
         state_out = stopped;
-        break;        
+        break;
     }
   }
 
@@ -121,117 +145,150 @@ int buttons_shutters::control_rotation() {
 
 
 
-float buttons_shutters::control_speed(int shutter_opening_closing_time ,int rolling_shutter_rotation_time) {
-     
-    power_request = (((shutter_opening_closing_time / 1000) * 0.1) * (-1000)) + 1000;
+float buttons_shutters::control_speed(int shutter_opening_closing_time, int rolling_shutter_rotation_time) {
+
+  
+
+  switch (state_out) {
+
+    case stopped:
+
+      is_on_shutters = false;
+      is_down_shutters = false;
+
+      //ROLLING
+
+      if (!is_down_stopped) sum_difference_time_start_down_shutters_rolling += difference_time_start_down_shutters_rolling;
+      if (!is_on_stopped) sum_difference_time_start_on_shutters_rolling += difference_time_start_on_shutters_rolling;
+
+      if (sum_difference_time_start_down_shutters_rolling > sum_difference_time_start_on_shutters_rolling) {
+        total_difference_time_start_down_on_shutters_rolling = 0;
+      } else {
+        total_difference_time_start_down_on_shutters_rolling = sum_difference_time_start_on_shutters_rolling - sum_difference_time_start_down_shutters_rolling;
+      }
+
+      // ON - OFF
+
+      if (!is_down_stopped) sum_difference_time_start_down_shutters += difference_time_start_down_shutters;
+      if (!is_on_stopped) sum_difference_time_start_on_shutters += difference_time_start_on_shutters;
+
+      if (sum_difference_time_start_down_shutters > sum_difference_time_start_on_shutters) {
+        total_difference_time_start_down_on_shutters = 0;
+      } else {
+        total_difference_time_start_down_on_shutters = sum_difference_time_start_on_shutters - sum_difference_time_start_down_shutters;
+      }
+
+
+      Serial.print("ON : ");
+      Serial.print(sum_difference_time_start_on_shutters_rolling);
+      Serial.print("\n");
+      Serial.print("DOWN : ");
+      Serial.print(sum_difference_time_start_down_shutters_rolling);
+      Serial.print("\n");
+      Serial.print("SUM : ");
+      Serial.print(total_difference_time_start_down_on_shutters_rolling);
+      Serial.print("\n");
+      Serial.print("+++++++++++++++++++++++++++++++++++++++++++++++");
+      Serial.print("\n");
+
+      // ON - OFF
+
+      // Serial.print("ON : ");
+      // Serial.print(sum_difference_time_start_on_shutters);
+      // Serial.print("\n");
+      // Serial.print("DOWN : ");
+      // Serial.print(sum_difference_time_start_down_shutters);
+      // Serial.print("\n");
+      // Serial.print("SUM : ");
+      // Serial.print(total_difference_time_start_down_on_shutters);
+      // Serial.print("\n");
+      // Serial.print("+++++++++++++++++++++++++++++++++++++++++++++++");
+      // Serial.print("\n");
+
+      is_on_stopped = true;
+      is_down_stopped = true;
+
+      break;
+
+    case on_shutters:
 
 
 
-    switch (state_out) {
+      // Serial.println(difference_time_start_on_shutters);
 
-      case stopped:
-           is_on_shutters = false;
-           is_down_shutters = false;
+      //ROLLING
 
-           if(!is_down_stopped)           
-           {
-          //  difference_time_start_on_shutters = difference_time_start_on_shutters - difference_time_start_down_shutters;
-          //  if(difference_time_start_on_shutters == 0) difference_time_start_on_shutters = 0;
+      if (!alza) {
 
-          //  sum_difference_time_start_on_shutters =- sum_difference_time_start_down_shutters; 
-          //  if(sum_difference_time_start_on_shutters == 0) sum_difference_time_start_on_shutters = 0;
-
-           sum_difference_time_start_down_shutters += difference_time_start_down_shutters;
-          //  if(sum_difference_time_start_down_shutters == 0) sum_difference_time_start_down_shutters = 0;
-          //  sum_difference_time_start_down_shutters = constrain(sum_difference_time_start_down_shutters, 0 ,shutter_opening_closing_time);
-           }
-
-           if(!is_on_stopped)
-           {
-            //  difference_time_start_down_shutters = difference_time_start_down_shutters - difference_time_start_on_shutters;
-            //  if(difference_time_start_down_shutters == 0) difference_time_start_down_shutters = 0;
-             
-             sum_difference_time_start_on_shutters += difference_time_start_on_shutters;
-            //  if(sum_difference_time_start_on_shutters == 0) sum_difference_time_start_on_shutters = 0;
-            //  sum_difference_time_start_on_shutters = constrain(sum_difference_time_start_on_shutters, 0 ,shutter_opening_closing_time);
-           }
+                if (!is_on_shutters_rolling) time_start_on_shutters_rolling = millis();
+        difference_time_start_on_shutters_rolling = millis() - time_start_on_shutters_rolling;
 
 
-          // totale = difference_time_start_on_shutters - difference_time_start_down_shutters;
-          // if(totale == 0) totale = 0;
-          // totale = constrain(totale, 0 ,shutter_opening_closing_time);
-          total_difference_time_start_down_on_shutters = sum_difference_time_start_on_shutters - sum_difference_time_start_down_shutters;
-          if(total_difference_time_start_down_on_shutters == 0) total_difference_time_start_down_on_shutters = 0;
+Serial.println(difference_time_start_on_shutters_rolling);
+        power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
+          
+        if (total_difference_time_start_down_on_shutters_rolling + difference_time_start_on_shutters_rolling >= rolling_shutter_rotation_time) {
+          
+          alza = true;
+        }
+        is_on_shutters_rolling = true;
+      }
 
-          Serial.print("ON : ");
-          Serial.print(sum_difference_time_start_on_shutters);
-          Serial.print("\n");
-          Serial.print("DOWN : ");
-          Serial.print(sum_difference_time_start_down_shutters);
-          Serial.print("\n");
-          Serial.print("SUM : ");
-          Serial.print(total_difference_time_start_down_on_shutters);
-          Serial.print("\n");
-          Serial.print("+++++++++++++++++++++++++++++++++++++++++++++++");
-          Serial.print("\n");
+      //ON - OFF
 
-          is_on_stopped = true;
-          is_down_stopped = true;
+      if (alza) {
 
-           
-          //  totale = difference_time_start_on_shutters - difference_time_start_down_shutters;
-          //  if(totale == 0) totale = 0;
-          //  totale = constrain(totale, 0 ,shutter_opening_closing_time);
-          //  Serial.print("totale : ");
-          //  Serial.print(totale);
-          //  Serial.print("\n");
-          //  Serial.print("difference_time_start_on_shutters : ");
-          //  Serial.print(difference_time_start_on_shutters);
-          //  Serial.print("\n");
-          //  Serial.print("difference_time_start_down_shutters : ");
-          //  Serial.print(difference_time_start_down_shutters);
-          //  Serial.print("\n");
-          //  Serial.print("=============================");
-          //  Serial.print("\n");
+                if (!is_on_shutters) time_start_on_shutters = millis();
+        difference_time_start_on_shutters = millis() - time_start_on_shutters;
 
-        break;
+        power_request = (((shutter_opening_closing_time / 1000) * 0.1) * (-1000)) + 1000;
 
-      case on_shutters: 
-           
-           if(!is_on_shutters) time_start_on_shutters = millis();
-           difference_time_start_on_shutters = millis() - time_start_on_shutters;
-          //  difference_time_start_on_shutters = constrain(difference_time_start_on_shutters, 0 ,shutter_opening_closing_time);
+        if (total_difference_time_start_down_on_shutters + difference_time_start_on_shutters >= shutter_opening_closing_time) {
 
-           Serial.println(difference_time_start_on_shutters);
+          Serial.println(total_difference_time_start_down_on_shutters);
+          
+          state_out = stopped;
+        }
+
+        alza = false;
+        is_on_shutters = true;
+      }
 
 
-          //  if(totale >= shutter_opening_closing_time) {
-          //    state_out = stopped;
-          //    power_request = 0;
-          //  }
+      
+      is_on_stopped = false;
+      break;
 
-           is_on_shutters = true; 
 
-          is_on_stopped = false;
-        break;
 
-      case down_shutters:
 
-           if(!is_down_shutters) time_start_down_shutters = millis();
-           difference_time_start_down_shutters = millis() - time_start_down_shutters;
-          //  difference_time_start_down_shutters = constrain(difference_time_start_down_shutters, 0 ,shutter_opening_closing_time);
 
-           Serial.println(difference_time_start_down_shutters);
+    case down_shutters:
 
-           is_down_shutters = true; 
-           is_down_stopped = false;
-        
-        break;        
-    }
+      if (!is_down_shutters) time_start_down_shutters = millis();
+      difference_time_start_down_shutters = millis() - time_start_down_shutters;
 
-    return power_request;
+      //ROLLING
 
+      if (difference_time_start_down_shutters > total_difference_time_start_down_on_shutters_rolling) {
+
+        //state_out = stopped;
+        power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
+
+        // power_request = 0;
+      }
+
+      is_down_shutters = true;
+      is_down_stopped = false;
+
+      break;
+  }
+
+  return power_request;
 }
+
+
+
 
 
 #endif
