@@ -46,7 +46,6 @@ float hysteresis_loop::find_power_request(float measurement) {
   }
 
   //limits range of power_request values to between min_power_request_range and max_power_request_range
-
   return constrain(power_request, min_power_request_range ,max_power_request_range);
 }
 
