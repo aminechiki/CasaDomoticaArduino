@@ -115,8 +115,11 @@ led light_room = led(min_power_request_range, max_power_request_range, ROOM_LIGH
 buttons_shutters buttons_control_shutters = buttons_shutters(BUTTON_ON_SHUTTERS ,BUTTON_DOWN_SHUTTERS);
 int direction_motor_shutters;
 enum states_motor_shutters {stopped, on_shutters ,down_shutters};
-int shutter_opening_closing_time = 8000;
+//time
+int shutter_opening_closing_time = 3000;
 int rolling_shutter_rotation_time = 1000;
+//power request
+float power_request_motor_shutters;
 
 // - MOTOR SHUTTERS
 
@@ -137,8 +140,8 @@ void loop() {
     direction_motor_shutters = buttons_control_shutters.control_rotation();
     motor_shutters_room.control_direction(direction_motor_shutters);
     //control speed
-    buttons_control_shutters.control_speed(shutter_opening_closing_time ,rolling_shutter_rotation_time);
-    motor_shutters_room.speed(200);
+    power_request_motor_shutters = buttons_control_shutters.control_speed(shutter_opening_closing_time ,rolling_shutter_rotation_time);
+    motor_shutters_room.speed(power_request_motor_shutters);
 
     //- CONTROL LIGHT ROOM
 

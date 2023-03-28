@@ -56,8 +56,7 @@ void motor_shutters::control_direction(int direction_motor_shutters) {
       digitalWrite(pin_down_motor_shutters, 0);
       break;
 
-    case down_shutters:
-      
+    case down_shutters:    
       //Serial.println("motore indietro");
       digitalWrite(pin_on_motor_shutters, 0);
       digitalWrite(pin_down_motor_shutters, 1);
