@@ -116,8 +116,8 @@ buttons_shutters buttons_control_shutters = buttons_shutters(BUTTON_ON_SHUTTERS 
 int direction_motor_shutters;
 enum states_motor_shutters {stopped, on_shutters ,down_shutters};
 //time
-int shutter_opening_closing_time = 8750;
-int rolling_shutter_rotation_time = 1000;
+int shutter_opening_closing_time = 6000;
+int rolling_shutter_rotation_time = 8800;
 //power request
 float power_request_motor_shutters;
 
