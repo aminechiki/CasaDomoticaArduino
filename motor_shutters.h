@@ -37,27 +37,23 @@ max_power_request_range = set_max_power_request_range;
 
 void motor_shutters::control_direction(int direction_motor_shutters) {
 
-  // if (direction_motor_shutters == stopped) Serial.println("motore fermo");
-  // if (direction_motor_shutters == on_shutters) Serial.println("motore avanti");
-  // if (direction_motor_shutters == down_shutters) Serial.println("motore indietro");
-
   switch (direction_motor_shutters) {
 
     case stopped:
-      //Serial.println("motore fermo");
+
       digitalWrite(pin_on_motor_shutters, 0);
       digitalWrite(pin_down_motor_shutters, 0);
 
       break;
 
     case on_shutters:
-      //Serial.println("motore avanti");
+
       digitalWrite(pin_on_motor_shutters, 1);
       digitalWrite(pin_down_motor_shutters, 0);
       break;
 
     case down_shutters:    
-      //Serial.println("motore indietro");
+
       digitalWrite(pin_on_motor_shutters, 0);
       digitalWrite(pin_down_motor_shutters, 1);
       break;
