@@ -4,7 +4,6 @@
 class pid {
 
 private:
-
   float power_request;
   float max_measurement_setpoint;
   float min_measurement_setpoint;

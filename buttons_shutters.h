@@ -70,70 +70,49 @@ public:
 
 //constructor
 buttons_shutters::buttons_shutters(int set_button_on_shutters, int set_button_down_shutters) {
-
   button_on_shutters = set_button_on_shutters;
   pinMode(button_on_shutters, 1);
   button_down_shutters = set_button_down_shutters;
   pinMode(button_down_shutters, 1);
 }
 
-//function
-
+//functions
 int buttons_shutters::control_rotation() {
 
+  //read and take button states
   pressed_button_on_shutters = digitalRead(button_on_shutters);
-
-  if (!previous_state_pressed_button_on_shutters && pressed_button_on_shutters) {
-
-    previous_state_pressed_button_on_shutters = pressed_button_on_shutters;
-
-    switch (state_out) {
-
-      case stopped:
-        state_out = on_shutters;
-        break;
-
-      case on_shutters:
-        state_out = stopped;
-        break;
-
-      case down_shutters:
-        state_out = stopped;
-        break;
-    }
-  }
-
-  if (previous_state_pressed_button_on_shutters && !pressed_button_on_shutters) {
-
-    previous_state_pressed_button_on_shutters = pressed_button_on_shutters;
-  }
-
-  // - MOTORE INDIETRO
-
   pressed_button_down_shutters = digitalRead(button_down_shutters);
 
-  if (!previous_state_pressed_button_down_shutters && pressed_button_down_shutters) {
-
-    previous_state_pressed_button_down_shutters = pressed_button_down_shutters;
+  //when one of the two buttons is pressed...
+  if ((!previous_state_pressed_button_on_shutters && pressed_button_on_shutters) || (!previous_state_pressed_button_down_shutters && pressed_button_down_shutters)) {
 
     switch (state_out) {
 
       case stopped:
-        state_out = down_shutters;
+        if (!previous_state_pressed_button_on_shutters && pressed_button_on_shutters) state_out = on_shutters;
+        if (!previous_state_pressed_button_down_shutters && pressed_button_down_shutters) state_out = down_shutters;
         break;
 
       case on_shutters:
-        state_out = stopped;
+        if (!previous_state_pressed_button_on_shutters && pressed_button_on_shutters) state_out = stopped;
+        if (!previous_state_pressed_button_down_shutters && pressed_button_down_shutters) state_out = stopped;
         break;
 
       case down_shutters:
-        state_out = stopped;
+        if (!previous_state_pressed_button_on_shutters && pressed_button_on_shutters) state_out = stopped;
+        if (!previous_state_pressed_button_down_shutters && pressed_button_down_shutters) state_out = stopped;
         break;
     }
+
+    //saves the current state of the buttons
+    previous_state_pressed_button_on_shutters = pressed_button_on_shutters;
+    previous_state_pressed_button_down_shutters = pressed_button_down_shutters;
   }
 
-  if (previous_state_pressed_button_down_shutters && !pressed_button_down_shutters) {
-
+  //when one of the two buttons is released ...
+  if ((previous_state_pressed_button_on_shutters && !pressed_button_on_shutters) || (previous_state_pressed_button_down_shutters && !pressed_button_down_shutters)) {
+    //saves the current state of the buttons
+    previous_state_pressed_button_on_shutters = pressed_button_on_shutters;
     previous_state_pressed_button_down_shutters = pressed_button_down_shutters;
   }
 
@@ -170,31 +149,31 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
 
       // ROLLING
 
-      Serial.print("+++++++++++ ROLLING +++++++++++");
-      Serial.print("\n");
-      Serial.print("ON : ");
-      Serial.print(sum_difference_time_start_on_shutters_rolling);
-      Serial.print("\n");
-      Serial.print("DOWN : ");
-      Serial.print(sum_difference_time_start_down_shutters_rolling);
-      Serial.print("\n");
-      Serial.print("SUM : ");
-      Serial.print(total_difference_time_start_down_on_shutters_rolling);
-      Serial.print("\n");
+      // Serial.print("+++++++++++ ROLLING +++++++++++");
+      // Serial.print("\n");
+      // Serial.print("ON : ");
+      // Serial.print(sum_difference_time_start_on_shutters_rolling);
+      // Serial.print("\n");
+      // Serial.print("DOWN : ");
+      // Serial.print(sum_difference_time_start_down_shutters_rolling);
+      // Serial.print("\n");
+      // Serial.print("SUM : ");
+      // Serial.print(total_difference_time_start_down_on_shutters_rolling);
+      // Serial.print("\n");
 
-      // ON - OFF
+      // // ON - OFF
 
-      Serial.print("+++++++++++ ON / OFF +++++++++++");
-      Serial.print("\n");
-      Serial.print("ON : ");
-      Serial.print(sum_difference_time_start_on_shutters);
-      Serial.print("\n");
-      Serial.print("DOWN : ");
-      Serial.print(sum_difference_time_start_down_shutters);
-      Serial.print("\n");
-      Serial.print("SUM : ");
-      Serial.print(total_difference_time_start_down_on_shutters);
-      Serial.print("\n");
+      // Serial.print("+++++++++++ ON / OFF +++++++++++");
+      // Serial.print("\n");
+      // Serial.print("ON : ");
+      // Serial.print(sum_difference_time_start_on_shutters);
+      // Serial.print("\n");
+      // Serial.print("DOWN : ");
+      // Serial.print(sum_difference_time_start_down_shutters);
+      // Serial.print("\n");
+      // Serial.print("SUM : ");
+      // Serial.print(total_difference_time_start_down_on_shutters);
+      // Serial.print("\n");
 
       is_on_shutters = false;
       is_down_shutters = false;
@@ -209,8 +188,8 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
 
       ////////
 
-      if(total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) raise_up = false;
-      if(total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) lower_down = false;
+      if (total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) raise_up = false;
+      if (total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) lower_down = false;
 
       break;
 
@@ -227,14 +206,14 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
         Serial.println(difference_time_start_on_shutters_rolling);
 
         if (total_difference_time_start_down_on_shutters_rolling + difference_time_start_on_shutters_rolling >= rolling_shutter_rotation_time) raise_up = true;
-          
+
         is_on_shutters_rolling = true;
       }
 
       //ON - OFF
 
       if (raise_up) {
-             
+
         if (!is_on_shutters) time_start_on_shutters = millis();
         difference_time_start_on_shutters = millis() - time_start_on_shutters;
 
@@ -254,7 +233,7 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
 
     case down_shutters:
 
-    //ROLLING
+      //ROLLING
 
       if (!lower_down) {
 
@@ -267,28 +246,28 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
         power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
 
         if (difference_time_start_down_shutters_rolling >= total_difference_time_start_down_on_shutters_rolling) {
-         
+
           lower_down = true;
         }
         is_down_shutters_rolling = true;
       }
 
 
-      if(lower_down) {
+      if (lower_down) {
 
         if (!is_down_shutters) time_start_down_shutters = millis();
         difference_time_start_down_shutters = millis() - time_start_down_shutters;
-        
+
         Serial.println(difference_time_start_down_shutters);
         power_request = (((shutter_opening_closing_time / 1000) * 0.1) * (-1000)) + 1000;
 
-        if(difference_time_start_down_shutters >= total_difference_time_start_down_on_shutters) {
-     
+        if (difference_time_start_down_shutters >= total_difference_time_start_down_on_shutters) {
+
           state_out = stopped;
         }
 
         is_down_shutters = true;
-      } 
+      }
 
       is_down_stopped = false;
 

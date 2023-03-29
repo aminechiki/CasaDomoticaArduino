@@ -70,7 +70,6 @@ float button::light_regolate(int minium_light_percentage, int max_light_percenta
       button_press_time = millis();
       button_pressed_light_led = true;
     }
-
     previous_state_button = state_in;
     state_out = !state_out;
   }

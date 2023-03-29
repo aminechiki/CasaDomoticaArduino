@@ -5,13 +5,11 @@ class hysteresis_loop {
 
 //parameters
 private:
-
   float max_measurement_setpoint;
   float min_measurement_setpoint;
   float min_power_request_range;
   float max_power_request_range;
   float power_request;
-
   bool safety_measurement;
 
 public:

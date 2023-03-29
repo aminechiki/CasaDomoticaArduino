@@ -5,7 +5,6 @@
 class valve {
 
 private:
-
   float min_power_request_range;
   float max_power_request_range;
   int actuator;
@@ -20,7 +19,6 @@ public:
 
 //constructor
 valve::valve(Servo set_servo, float set_min_power_request_range, float set_max_power_request_range, int set_actuator) {
-
   servo = set_servo;
   actuator = set_actuator;
   min_power_request_range = set_min_power_request_range;
@@ -28,9 +26,7 @@ valve::valve(Servo set_servo, float set_min_power_request_range, float set_max_p
 }
 
 //function
-
 int valve::spin(float power_request) {
-
 
   if (safety) {
     angle_valve = 0;
@@ -39,7 +35,6 @@ int valve::spin(float power_request) {
     servo.attach(actuator);
     servo.write(angle_valve);
   }
-
   return angle_valve;
 }
 

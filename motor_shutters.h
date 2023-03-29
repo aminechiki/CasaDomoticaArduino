@@ -13,7 +13,6 @@ private:
   enum states_motor_shutters { stopped,
                                on_shutters,
                                down_shutters };
-
 public:
   bool safety;
   motor_shutters(int set_pin_on_motor_shutters ,int set_pin_down_motor_shutters ,int pin_control_speed_motor, float set_min_power_request_range ,float set_max_power_request_range);
@@ -40,26 +39,21 @@ void motor_shutters::control_direction(int direction_motor_shutters) {
   switch (direction_motor_shutters) {
 
     case stopped:
-
       digitalWrite(pin_on_motor_shutters, 0);
       digitalWrite(pin_down_motor_shutters, 0);
-
       break;
 
     case on_shutters:
-
       digitalWrite(pin_on_motor_shutters, 1);
       digitalWrite(pin_down_motor_shutters, 0);
       break;
 
     case down_shutters:    
-
       digitalWrite(pin_on_motor_shutters, 0);
       digitalWrite(pin_down_motor_shutters, 1);
       break;
   }
 }
-
 
 void motor_shutters::speed(float power_request) {
 
