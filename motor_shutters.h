@@ -59,7 +59,6 @@ void motor_shutters::speed(float power_request) {
 
 if(safety) power_request = 0;
 if(!safety) power_request = map(power_request, min_power_request_range, max_power_request_range, 0, 255);
-
 analogWrite(pin_control_speed_motor ,power_request);
 }
 

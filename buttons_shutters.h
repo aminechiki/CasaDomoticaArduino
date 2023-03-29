@@ -4,6 +4,11 @@
 class buttons_shutters {
 
 private:
+
+  //power request
+  float power_request;
+  int min_power_request_range;
+  int max_power_request_range;
   //time
   int shutter_opening_closing_time;
   int rolling_shutter_rotation_time;
@@ -30,7 +35,6 @@ private:
   int pressed_button_down_shutters;
   int previous_state_pressed_button_down_shutters;
   //out
-  float power_request;
   int state_out;
   enum states_motor_shutters { stopped,
                                on_shutters,
@@ -63,17 +67,19 @@ private:
   bool is_down_shutters_rolling;
 
 public:
-  buttons_shutters(int button_on_shutters, int button_down_shutters);
+  buttons_shutters(int button_on_shutters, int button_down_shutters ,float min_power_request_range, float max_power_request_range);
   int control_rotation();
-  float control_speed(int shutter_opening_closing_time, int rolling_shutter_rotation_time);
+  float control_speed(int shutter_opening_closing_time, int rolling_shutter_rotation_time ,int max_shutter_working_time);
 };
 
 //constructor
-buttons_shutters::buttons_shutters(int set_button_on_shutters, int set_button_down_shutters) {
+buttons_shutters::buttons_shutters(int set_button_on_shutters, int set_button_down_shutters ,float set_min_power_request_range, float set_max_power_request_range) {
   button_on_shutters = set_button_on_shutters;
   pinMode(button_on_shutters, 1);
   button_down_shutters = set_button_down_shutters;
   pinMode(button_down_shutters, 1);
+  min_power_request_range = set_min_power_request_range;
+  max_power_request_range = set_max_power_request_range;
 }
 
 //functions
@@ -119,35 +125,46 @@ int buttons_shutters::control_rotation() {
   return state_out;
 }
 
-float buttons_shutters::control_speed(int shutter_opening_closing_time, int rolling_shutter_rotation_time) {
+float buttons_shutters::control_speed(int shutter_opening_closing_time, int rolling_shutter_rotation_time ,int max_shutter_working_time) {
 
   switch (state_out) {
 
     case stopped:
 
-      //ROLLING
+    power_request = 0;
+      
+      // - calculates the difference in engine displacements based on the displacements it has made
 
+      //roller shutter rotation
       if (!is_down_stopped && is_down_shutters_rolling) sum_difference_time_start_down_shutters_rolling += difference_time_start_down_shutters_rolling;
       if (!is_on_stopped && is_on_shutters_rolling) sum_difference_time_start_on_shutters_rolling += difference_time_start_on_shutters_rolling;
-
       if (sum_difference_time_start_down_shutters_rolling > sum_difference_time_start_on_shutters_rolling) {
         total_difference_time_start_down_on_shutters_rolling = 0;
       } else {
         total_difference_time_start_down_on_shutters_rolling = sum_difference_time_start_on_shutters_rolling - sum_difference_time_start_down_shutters_rolling;
       }
 
-      // ON - OFF
-
+      // go up and down the roller shutter
       if (!is_down_stopped && is_down_shutters) sum_difference_time_start_down_shutters += difference_time_start_down_shutters;
       if (!is_on_stopped && is_on_shutters) sum_difference_time_start_on_shutters += difference_time_start_on_shutters;
-
       if (sum_difference_time_start_down_shutters > sum_difference_time_start_on_shutters) {
         total_difference_time_start_down_on_shutters = 0;
       } else {
         total_difference_time_start_down_on_shutters = sum_difference_time_start_on_shutters - sum_difference_time_start_down_shutters;
       }
 
-      // ROLLING
+      //PERCENTAGE REGOLATION
+
+      Serial.print("+++++++++++ PERCENTAGE REGOLATION +++++++++++");
+      Serial.print("\n");
+      Serial.print("PERCENTUALE SALI SCENDI TENDE : ");
+      Serial.print(((float)total_difference_time_start_down_on_shutters / (float)shutter_opening_closing_time) * 100);
+      Serial.print("\n");
+      Serial.print("PERCENTUALE REGOLAZIONE TENDE : ");
+      Serial.print(((float)total_difference_time_start_down_on_shutters_rolling / (float)rolling_shutter_rotation_time) * 100);
+      Serial.print("\n");
+
+      //roller shutter rotation
 
       // Serial.print("+++++++++++ ROLLING +++++++++++");
       // Serial.print("\n");
@@ -158,10 +175,10 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
       // Serial.print(sum_difference_time_start_down_shutters_rolling);
       // Serial.print("\n");
       // Serial.print("SUM : ");
-      // Serial.print(total_difference_time_start_down_on_shutters_rolling);
+      // Serial.print(((float)total_difference_time_start_down_on_shutters_rolling / (float)rolling_shutter_rotation_time) * 100);
       // Serial.print("\n");
 
-      // // ON - OFF
+      // go up and down the roller shutter
 
       // Serial.print("+++++++++++ ON / OFF +++++++++++");
       // Serial.print("\n");
@@ -172,105 +189,62 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
       // Serial.print(sum_difference_time_start_down_shutters);
       // Serial.print("\n");
       // Serial.print("SUM : ");
-      // Serial.print(total_difference_time_start_down_on_shutters);
+      // Serial.print(((float)total_difference_time_start_down_on_shutters / (float)shutter_opening_closing_time) * 100) ;
       // Serial.print("\n");
 
+      //reset states
       is_on_shutters = false;
       is_down_shutters = false;
-
       is_on_stopped = true;
       is_down_stopped = true;
-
-      ////// ROLLING
-
       is_on_shutters_rolling = false;
       is_down_shutters_rolling = false;
-
-      ////////
-
-      if (total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) raise_up = false;
-      if (total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) lower_down = false;
-
+       raise_up = false;
+       lower_down = false;
       break;
 
     case on_shutters:
 
-      //ROLLING
-
-      if (!raise_up) {
-
+      //roller shutter rotation
+      if (!raise_up) {        
         if (!is_on_shutters_rolling) time_start_on_shutters_rolling = millis();
         difference_time_start_on_shutters_rolling = millis() - time_start_on_shutters_rolling;
-
-        power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
-        Serial.println(difference_time_start_on_shutters_rolling);
-
+        power_request = ((((float)rolling_shutter_rotation_time - (float)min_power_request_range) / ((float)max_shutter_working_time) - (float)min_power_request_range) * (-max_power_request_range)  ) + max_power_request_range; 
         if (total_difference_time_start_down_on_shutters_rolling + difference_time_start_on_shutters_rolling >= rolling_shutter_rotation_time) raise_up = true;
-
         is_on_shutters_rolling = true;
       }
 
-      //ON - OFF
-
+      // go up and down the roller shutter
       if (raise_up) {
-
         if (!is_on_shutters) time_start_on_shutters = millis();
         difference_time_start_on_shutters = millis() - time_start_on_shutters;
-
-        power_request = (((shutter_opening_closing_time / 1000) * 0.1) * (-1000)) + 1000;
-        Serial.println(difference_time_start_on_shutters);
-
-        if (total_difference_time_start_down_on_shutters + difference_time_start_on_shutters >= shutter_opening_closing_time) {
-
-          state_out = stopped;
-        }
-
+        power_request = ((((float)shutter_opening_closing_time - (float)min_power_request_range) / ((float)max_shutter_working_time) - (float)min_power_request_range) * (-max_power_request_range)  ) + max_power_request_range;
+        if (total_difference_time_start_down_on_shutters + difference_time_start_on_shutters >= shutter_opening_closing_time) state_out = stopped;
         is_on_shutters = true;
       }
-
       is_on_stopped = false;
       break;
 
     case down_shutters:
 
-      //ROLLING
-
+      //roller shutter rotation
       if (!lower_down) {
-
         if (!is_down_shutters_rolling) time_start_down_shutters_rolling = millis();
         difference_time_start_down_shutters_rolling = millis() - time_start_down_shutters_rolling;
-
-        Serial.println(difference_time_start_down_shutters_rolling);
-
-        Serial.println("SONO QUI DENTRO");
-        power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
-
-        if (difference_time_start_down_shutters_rolling >= total_difference_time_start_down_on_shutters_rolling) {
-
-          lower_down = true;
-        }
+        power_request = ((((float)rolling_shutter_rotation_time - (float)min_power_request_range) / ((float)max_shutter_working_time) - (float)min_power_request_range) * (-max_power_request_range)  ) + max_power_request_range;
+        if (difference_time_start_down_shutters_rolling >= total_difference_time_start_down_on_shutters_rolling) lower_down = true;
         is_down_shutters_rolling = true;
       }
 
-
+      // go up and down the roller shutter
       if (lower_down) {
-
         if (!is_down_shutters) time_start_down_shutters = millis();
         difference_time_start_down_shutters = millis() - time_start_down_shutters;
-
-        Serial.println(difference_time_start_down_shutters);
-        power_request = (((shutter_opening_closing_time / 1000) * 0.1) * (-1000)) + 1000;
-
-        if (difference_time_start_down_shutters >= total_difference_time_start_down_on_shutters) {
-
-          state_out = stopped;
-        }
-
+        power_request = ((((float)shutter_opening_closing_time - (float)min_power_request_range) / ((float)max_shutter_working_time) - (float)min_power_request_range) * (-max_power_request_range)  ) + max_power_request_range;
+        if (difference_time_start_down_shutters >= total_difference_time_start_down_on_shutters) state_out = stopped;
         is_down_shutters = true;
       }
-
       is_down_stopped = false;
-
       break;
   }
 
