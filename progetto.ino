@@ -6,8 +6,8 @@
 #include "timer.h"
 #include <Servo.h>
 #include "button.h"
-#include "motor_shutters.h"
-#include "buttons_shutters.h"
+#include "shutters.h"
+#include "control_shutters.h"
 
 //CONTROL ROOM - (Arduino)
 //INPUT
@@ -15,6 +15,7 @@
 #define LIGHT_CONTROL 9
 #define BUTTON_ON_SHUTTERS 6
 #define BUTTON_DOWN_SHUTTERS 5
+#define SENSOR_LIGHT A0
 
 //OUTPUT
 #define TEMPERATURE_VALVE 5
@@ -109,12 +110,9 @@ led light_room = led(min_power_request_range, max_power_request_range, ROOM_LIGH
 
 // - CONTROL SHUTTERS
 
-// BUTTON_ON_SHUTTERS 5
-// BUTTON_DOWN_SHUTTERS 6
-
-buttons_shutters buttons_control_shutters = buttons_shutters(BUTTON_ON_SHUTTERS ,BUTTON_DOWN_SHUTTERS, min_power_request_range, max_power_request_range);
+control_shutters buttons_control_shutters = control_shutters(SENSOR_LIGHT, BUTTON_ON_SHUTTERS ,BUTTON_DOWN_SHUTTERS, min_power_request_range, max_power_request_range);
 int direction_motor_shutters;
-enum states_motor_shutters {stopped, on_shutters ,down_shutters};
+//enum states_motor_shutters {stopped, on_shutters ,down_shutters};
 //time
 int shutter_opening_closing_time = 6000;
 int rolling_shutter_rotation_time = 8100;
@@ -122,11 +120,15 @@ int max_shutter_working_time = 10000;
 //power request
 float power_request_motor_shutters;
 
+// - automatic
+bool automatic_mode_shutters;
+
+
+
+
 // - MOTOR SHUTTERS
 
-motor_shutters motor_shutters_room = motor_shutters(MOTOR_ON_SHUTTERS, MOTOR_DOWN_SHUTTERS, MOTOR_SPEED ,min_power_request_range ,max_power_request_range);
-
-
+shutters shutters_room = shutters(MOTOR_ON_SHUTTERS, MOTOR_DOWN_SHUTTERS, MOTOR_SPEED ,min_power_request_range ,max_power_request_range);
 
 void setup() {
   Serial.begin(9600);
@@ -135,14 +137,18 @@ void setup() {
 
 void loop() {
 
+  // TEST 
+
+  if((millis() >= 20000) && (millis() <= 20200)) automatic_mode_shutters = true;
+
     // - CONTROL SHUTTERS ROOM
 
     //control direction
     direction_motor_shutters = buttons_control_shutters.control_rotation();
-    motor_shutters_room.control_direction(direction_motor_shutters);
+    shutters_room.direction(direction_motor_shutters);
     //control speed
-    power_request_motor_shutters = buttons_control_shutters.control_speed(shutter_opening_closing_time ,rolling_shutter_rotation_time ,max_shutter_working_time);
-    motor_shutters_room.speed(power_request_motor_shutters);
+    power_request_motor_shutters = buttons_control_shutters.regolate_shutters(automatic_mode_shutters ,shutter_opening_closing_time ,rolling_shutter_rotation_time ,max_shutter_working_time);
+    shutters_room.speed(power_request_motor_shutters);
 
     //- CONTROL LIGHT ROOM
 

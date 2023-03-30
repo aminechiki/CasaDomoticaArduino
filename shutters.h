@@ -1,7 +1,7 @@
-#ifndef motor_shutters_h
-#define motor_shutters_h
+#ifndef shutters_h
+#define shutters_h
 
-class motor_shutters {
+class shutters {
 
 private:
   int pin_on_motor_shutters;
@@ -15,13 +15,13 @@ private:
                                down_shutters };
 public:
   bool safety;
-  motor_shutters(int set_pin_on_motor_shutters ,int set_pin_down_motor_shutters ,int pin_control_speed_motor, float set_min_power_request_range ,float set_max_power_request_range);
-  void control_direction(int direction_motor_shutters);
+  shutters(int set_pin_on_motor_shutters ,int set_pin_down_motor_shutters ,int pin_control_speed_motor, float set_min_power_request_range ,float set_max_power_request_range);
+  void direction(int direction_motor_shutters);
   void speed(float power_request);
 };
 
 //constructor
-motor_shutters::motor_shutters(int set_pin_on_motor_shutters ,int set_pin_down_motor_shutters ,int set_pin_control_speed_motor, float set_min_power_request_range ,float set_max_power_request_range) {
+shutters::shutters(int set_pin_on_motor_shutters ,int set_pin_down_motor_shutters ,int set_pin_control_speed_motor, float set_min_power_request_range ,float set_max_power_request_range) {
  
 pin_on_motor_shutters = set_pin_on_motor_shutters;
 pinMode(pin_on_motor_shutters, 0);
@@ -30,11 +30,10 @@ pinMode(pin_down_motor_shutters, 0);
 pin_control_speed_motor = set_pin_control_speed_motor;
 min_power_request_range = set_min_power_request_range;
 max_power_request_range = set_max_power_request_range;
-
 }
 //function
 
-void motor_shutters::control_direction(int direction_motor_shutters) {
+void shutters::direction(int direction_motor_shutters) {
 
   switch (direction_motor_shutters) {
 
@@ -55,7 +54,7 @@ void motor_shutters::control_direction(int direction_motor_shutters) {
   }
 }
 
-void motor_shutters::speed(float power_request) {
+void shutters::speed(float power_request) {
 
 if(safety) power_request = 0;
 if(!safety) power_request = map(power_request, min_power_request_range, max_power_request_range, 0, 255);
