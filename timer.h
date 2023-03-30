@@ -14,7 +14,6 @@ public:
 };
 
 //constructor
-
 timer::timer(int set_time) {
 
   time = set_time;
@@ -25,14 +24,11 @@ bool timer::check_time() {
   difference_time_system_time_start = millis() - time_start;
 
   if (difference_time_system_time_start >= time) {
-
     time_start = millis();
     return true;
-
   } else {
     return false;
   }
 }
-
 
 #endif
