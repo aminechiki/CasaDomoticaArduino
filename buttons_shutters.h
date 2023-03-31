@@ -149,31 +149,31 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
 
       // ROLLING
 
-      // Serial.print("+++++++++++ ROLLING +++++++++++");
-      // Serial.print("\n");
-      // Serial.print("ON : ");
-      // Serial.print(sum_difference_time_start_on_shutters_rolling);
-      // Serial.print("\n");
-      // Serial.print("DOWN : ");
-      // Serial.print(sum_difference_time_start_down_shutters_rolling);
-      // Serial.print("\n");
-      // Serial.print("SUM : ");
-      // Serial.print(total_difference_time_start_down_on_shutters_rolling);
-      // Serial.print("\n");
+      Serial.print("+++++++++++ ROLLING +++++++++++");
+      Serial.print("\n");
+      Serial.print("ON : ");
+      Serial.print(sum_difference_time_start_on_shutters_rolling);
+      Serial.print("\n");
+      Serial.print("DOWN : ");
+      Serial.print(sum_difference_time_start_down_shutters_rolling);
+      Serial.print("\n");
+      Serial.print("SUM : ");
+      Serial.print(total_difference_time_start_down_on_shutters_rolling);
+      Serial.print("\n");
 
-      // // ON - OFF
+      // ON - OFF
 
-      // Serial.print("+++++++++++ ON / OFF +++++++++++");
-      // Serial.print("\n");
-      // Serial.print("ON : ");
-      // Serial.print(sum_difference_time_start_on_shutters);
-      // Serial.print("\n");
-      // Serial.print("DOWN : ");
-      // Serial.print(sum_difference_time_start_down_shutters);
-      // Serial.print("\n");
-      // Serial.print("SUM : ");
-      // Serial.print(total_difference_time_start_down_on_shutters);
-      // Serial.print("\n");
+      Serial.print("+++++++++++ ON / OFF +++++++++++");
+      Serial.print("\n");
+      Serial.print("ON : ");
+      Serial.print(sum_difference_time_start_on_shutters);
+      Serial.print("\n");
+      Serial.print("DOWN : ");
+      Serial.print(sum_difference_time_start_down_shutters);
+      Serial.print("\n");
+      Serial.print("SUM : ");
+      Serial.print(total_difference_time_start_down_on_shutters);
+      Serial.print("\n");
 
       is_on_shutters = false;
       is_down_shutters = false;
@@ -186,10 +186,10 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
       is_on_shutters_rolling = false;
       is_down_shutters_rolling = false;
 
-      ////////
+      
+       raise_up = false;
+       lower_down = false;
 
-      if (total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) raise_up = false;
-      if (total_difference_time_start_down_on_shutters_rolling <= rolling_shutter_rotation_time) lower_down = false;
 
       break;
 
@@ -242,7 +242,6 @@ float buttons_shutters::control_speed(int shutter_opening_closing_time, int roll
 
         Serial.println(difference_time_start_down_shutters_rolling);
 
-        Serial.println("SONO QUI DENTRO");
         power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
 
         if (difference_time_start_down_shutters_rolling >= total_difference_time_start_down_on_shutters_rolling) {
