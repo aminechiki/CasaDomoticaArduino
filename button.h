@@ -4,7 +4,6 @@
 class button {
 
 private:
-  
   //PIN INPUT
   int pin_in;
   //POWER REQUEST
