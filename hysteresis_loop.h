@@ -39,7 +39,17 @@ float hysteresis_loop::find_power_request(float measurement) {
   if (safety_power_request) {
     power_request = 0;
   } else {
-    if(action_measurement) power_request = ((measurement - min_measurement_setpoint) / (max_measurement_setpoint - min_measurement_setpoint)) * (max_power_request_range - min_power_request_range) + min_power_request_range;
+    
+    if(action_measurement) {
+      Serial.println("SEI QUA DENTRO");
+      power_request = ((measurement - min_measurement_setpoint) / (max_measurement_setpoint - min_measurement_setpoint)) * (max_power_request_range - min_power_request_range) + min_power_request_range;
+      Serial.println(measurement);
+      Serial.println(min_measurement_setpoint);
+      Serial.println(max_measurement_setpoint);
+      Serial.println(max_power_request_range);
+      Serial.println(min_power_request_range);
+      Serial.println(power_request);
+    } 
     if(!action_measurement) power_request = ((measurement - min_measurement_setpoint) / (max_measurement_setpoint - min_measurement_setpoint) * (min_power_request_range - max_power_request_range)) + max_power_request_range;  
   }
 
