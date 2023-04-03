@@ -250,33 +250,6 @@ float control_shutters::regolate_shutters(float sensor_light_value, int shutter_
 
       if (total_difference_time_start_down_on_shutters >= shutter_opening_closing_time) total_difference_time_start_down_on_shutters = shutter_opening_closing_time;
 
-<<<<<<< HEAD:buttons_shutters.h
-      Serial.print("+++++++++++ ROLLING +++++++++++");
-      Serial.print("\n");
-      Serial.print("ON : ");
-      Serial.print(sum_difference_time_start_on_shutters_rolling);
-      Serial.print("\n");
-      Serial.print("DOWN : ");
-      Serial.print(sum_difference_time_start_down_shutters_rolling);
-      Serial.print("\n");
-      Serial.print("SUM : ");
-      Serial.print(total_difference_time_start_down_on_shutters_rolling);
-      Serial.print("\n");
-
-      // ON - OFF
-
-      Serial.print("+++++++++++ ON / OFF +++++++++++");
-      Serial.print("\n");
-      Serial.print("ON : ");
-      Serial.print(sum_difference_time_start_on_shutters);
-      Serial.print("\n");
-      Serial.print("DOWN : ");
-      Serial.print(sum_difference_time_start_down_shutters);
-      Serial.print("\n");
-      Serial.print("SUM : ");
-      Serial.print(total_difference_time_start_down_on_shutters);
-      Serial.print("\n");
-=======
       //PERCENTAGE REGOLATION
       // Serial.print("+++++++++++ PERCENTAGE REGOLATION +++++++++++");
       // Serial.print("\n");
@@ -312,7 +285,7 @@ float control_shutters::regolate_shutters(float sensor_light_value, int shutter_
       // Serial.print("SUM : ");
       // Serial.print(((float)total_difference_time_start_down_on_shutters / (float)shutter_opening_closing_time) * 100) ;
       // Serial.print("\n");
->>>>>>> 43321d282ccae75f94de98d08519c20500148592:control_shutters.h
+
 
       //reset states
       is_on_shutters = false;
@@ -321,17 +294,10 @@ float control_shutters::regolate_shutters(float sensor_light_value, int shutter_
       is_down_stopped = true;
       is_on_shutters_rolling = false;
       is_down_shutters_rolling = false;
-<<<<<<< HEAD:buttons_shutters.h
 
-      
-       raise_up = false;
-       lower_down = false;
-
-
-=======
       raise_up = false;
       lower_down = false;
->>>>>>> 43321d282ccae75f94de98d08519c20500148592:control_shutters.h
+
       break;
 
     case on_shutters:
@@ -394,21 +360,11 @@ float control_shutters::regolate_shutters(float sensor_light_value, int shutter_
         difference_time_start_down_shutters_rolling = millis() - time_start_down_shutters_rolling;
         power_request = ((((float)rolling_shutter_rotation_time - (float)min_power_request_range) / ((float)max_shutter_working_time) - (float)min_power_request_range) * (-max_power_request_range)) + max_power_request_range;
 
-<<<<<<< HEAD:buttons_shutters.h
-        Serial.println(difference_time_start_down_shutters_rolling);
-
-        power_request = (((rolling_shutter_rotation_time / 1000) * 0.1) * (-1000)) + 1000;
-
-        if (difference_time_start_down_shutters_rolling >= total_difference_time_start_down_on_shutters_rolling) {
-
-          lower_down = true;
-=======
         //percentage update
         if ((sum_difference_time_start_down_shutters_rolling + difference_time_start_down_shutters_rolling) > sum_difference_time_start_on_shutters_rolling) {
           total_difference_time_start_down_on_shutters_rolling = 0;
         } else {
           total_difference_time_start_down_on_shutters_rolling = sum_difference_time_start_on_shutters_rolling - (sum_difference_time_start_down_shutters_rolling + difference_time_start_down_shutters_rolling);
->>>>>>> 43321d282ccae75f94de98d08519c20500148592:control_shutters.h
         }
 
         if (total_difference_time_start_down_on_shutters_rolling == 0) lower_down = true;

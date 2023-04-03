@@ -123,7 +123,7 @@ int direction_motor_shutters;
 //enum states_motor_shutters {stopped, on_shutters ,down_shutters};
 //time
 int shutter_opening_closing_time = 6000;
-int rolling_shutter_rotation_time = 8000;
+int rolling_shutter_rotation_time = 7800;
 int max_shutter_working_time = 10000;
 //power request
 float power_request_motor_shutters;
